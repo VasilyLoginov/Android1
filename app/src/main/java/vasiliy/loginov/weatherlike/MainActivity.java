@@ -2,6 +2,8 @@ package vasiliy.loginov.weatherlike;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,14 +13,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements Constants {
 
     protected final String[] LOC = {"Краснодар", "Москва", "Санкт-Петербург", "Улан-Удэ"};
+    protected final String[] ADDR = {"krasnodar-5136/now/", "moscow-4368/now/", "sankt-peterburg-4079/now/", "ulan-ude-4804/now/"};
     protected final String[] TEMP ={" +25", " +19", " +15", " +20"};
     protected final String[] HUM ={" 95", "90", "99", "80"};
     protected final String[] PRES ={" 750", "745", "760", "735"};
 
+
     private int count;
+    private String addres;
+    private final String ADDRES = "https://www.gismeteo.ru/weather-";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         String instanceState;
         if (savedInstanceState == null){
             instanceState = "Первый запуск!";
-            count = 3;
+            count = 0;
         }
         else{
             instanceState = "Повторный запуск!";
@@ -41,11 +47,9 @@ public class MainActivity extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                outPutValues(count);
                 count ++;
-                if(count > 3){
-                    count = 0;
-                }
+                if(count > 3){count = 0;}
+                outPutValues(count);
             }
         });
 
@@ -54,6 +58,33 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 findCity();
+            }
+        });
+
+        Button buttonJumpToBrowser = findViewById(R.id.buttonJumpToBrowser);
+        buttonJumpToBrowser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addres = ADDRES + ADDR[count];
+                Uri address = Uri.parse(addres);
+                Intent linkInet = new Intent(Intent.ACTION_VIEW, address);
+                startActivity(linkInet);
+            }
+        });
+
+        Button buttonJumpToSecondActivity = findViewById(R.id.buttonJumpToSecondActivity);
+        buttonJumpToSecondActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addres = ADDRES + ADDR[count];
+                String tempTxt = TEMP[count];
+                String locTxt = LOC[count];
+
+                Intent intent = new Intent(MainActivity.this, SecondActivity.class);
+                intent.putExtra(CITY_TEXT, locTxt);
+                intent.putExtra(TEMP_TEXT, tempTxt);
+                intent.putExtra(ADDR_TEXT, addres);
+                startActivity(intent);
             }
         });
 
@@ -94,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
         Toast.makeText(getApplicationContext(), "onSaveInstanceState()", Toast.LENGTH_SHORT).show();
         Log.d("MainActivity", "onSaveInstanceState()");
-        savedInstanceState.putInt("Counter", count - 1);
+        savedInstanceState.putInt("Counter", count);
     }
 
     @Override
@@ -151,7 +182,8 @@ public class MainActivity extends AppCompatActivity {
         String stringLine = editText1.getText().toString();
         for(String element:LOC){
             if(element.equals(stringLine)){
-                outPutValues(c);;
+                outPutValues(c);
+                count = c;
             }
             c++;
         }
