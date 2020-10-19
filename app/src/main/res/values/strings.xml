@@ -4,4 +4,6 @@
     <string name="temperature_text">Temperature:</string>
     <string name="humidity_text">Humidity:</string>
     <string name="pressure_text">"Pressure: "</string>
+    <string name="button1_text">City</string>
+    <string name="button2_text">Find</string>
 </resources>
